@@ -1,0 +1,61 @@
+{
+    "MetricDataResults": [
+        {
+            "Id": "m0_in",
+            "Label": "InputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00", "2026-09-11T00:00:00+00:00"],
+            "Values": [130000.0, 500000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_out",
+            "Label": "OutputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00"],
+            "Values": [54000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_cr",
+            "Label": "CacheReadInputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00"],
+            "Values": [50000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_cw",
+            "Label": "CacheWriteInputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00"],
+            "Values": [2000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m1_in",
+            "Label": "InputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00"],
+            "Values": [5000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m1_out",
+            "Label": "OutputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00"],
+            "Values": [2000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m2_in",
+            "Label": "InputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00"],
+            "Values": [1200.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m2_out",
+            "Label": "OutputTokenCount",
+            "Timestamps": ["2026-09-11T03:00:00+00:00"],
+            "Values": [300.0],
+            "StatusCode": "Complete"
+        }
+    ],
+    "Messages": []
+}

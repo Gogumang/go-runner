@@ -1,0 +1,89 @@
+{
+    "MetricDataResults": [
+        {
+            "Id": "m0_in",
+            "Label": "InputTokenCount",
+            "Timestamps": ["2026-09-11T03:09:00+00:00", "2026-09-11T03:07:00+00:00"],
+            "Values": [10000.0, 20000.0],
+            "StatusCode": "PartialData"
+        },
+        {
+            "Id": "m0_out",
+            "Label": "OutputTokenCount",
+            "Timestamps": ["2026-09-11T03:09:00+00:00", "2026-09-11T03:07:00+00:00", "2026-09-11T03:02:00+00:00"],
+            "Values": [1000.0, 3000.0, 50000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_cw",
+            "Label": "CacheWriteInputTokenCount",
+            "Timestamps": ["2026-09-11T03:09:00+00:00"],
+            "Values": [2000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_cr",
+            "Label": "CacheReadInputTokenCount",
+            "Timestamps": ["2026-09-11T03:09:00+00:00"],
+            "Values": [50000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_inv",
+            "Label": "Invocations",
+            "Timestamps": ["2026-09-11T03:09:00+00:00", "2026-09-11T03:07:00+00:00"],
+            "Values": [4.0, 7.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_thr",
+            "Label": "InvocationThrottles",
+            "Timestamps": ["2026-09-11T03:07:00+00:00"],
+            "Values": [2.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_est",
+            "Label": "EstimatedTPMQuotaUsage",
+            "Timestamps": [],
+            "Values": [],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m1_in",
+            "Label": "InputTokenCount",
+            "Timestamps": ["2026-09-11T03:08:00+00:00"],
+            "Values": [5000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m1_out",
+            "Label": "OutputTokenCount",
+            "Timestamps": ["2026-09-11T03:08:00+00:00"],
+            "Values": [2000.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m2_in",
+            "Label": "InputTokenCount",
+            "Timestamps": ["2026-09-11T03:06:00+00:00"],
+            "Values": [1200.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m2_out",
+            "Label": "OutputTokenCount",
+            "Timestamps": ["2026-09-11T03:06:00+00:00"],
+            "Values": [300.0],
+            "StatusCode": "Complete"
+        },
+        {
+            "Id": "m0_in",
+            "Label": "InputTokenCount",
+            "Timestamps": ["2026-09-11T03:02:00+00:00"],
+            "Values": [100000.0],
+            "StatusCode": "Complete"
+        }
+    ],
+    "Messages": []
+}

@@ -1,0 +1,11 @@
+.build/
+.build-*/
+build/
+.DS_Store
+*.xcodeproj/xcuserdata/
+.swiftpm/
+
+# Planning and research notes from development stay local; only the research the code cites is published.
+docs/plan/
+docs/research/*
+!docs/research/04-ai-quota.md

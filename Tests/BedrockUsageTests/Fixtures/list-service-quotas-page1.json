@@ -1,0 +1,56 @@
+{
+    "Quotas": [
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaArn": "arn:aws:servicequotas:us-east-1:111122223333:bedrock/L-00000001",
+            "QuotaCode": "L-00000001",
+            "QuotaName": "On-demand model inference tokens per minute for Anthropic Claude Sonnet 4.5",
+            "Value": 400000.0,
+            "Unit": "None",
+            "Adjustable": true,
+            "GlobalQuota": false
+        },
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaCode": "L-00000002",
+            "QuotaName": "Cross-region model inference tokens per minute for Anthropic Claude Sonnet 4.5",
+            "Value": 200000.0,
+            "Unit": "None",
+            "Adjustable": true,
+            "GlobalQuota": false
+        },
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaCode": "L-00000003",
+            "QuotaName": "Cross-region model inference requests per minute for Anthropic Claude Sonnet 4.5",
+            "Value": 200.0,
+            "Unit": "None",
+            "Adjustable": true,
+            "GlobalQuota": false
+        },
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaCode": "L-00000004",
+            "QuotaName": "Cross-region model inference tokens per minute for Anthropic Claude Sonnet 4.5 V1 1M Context Length",
+            "Value": 100000.0,
+            "Unit": "None",
+            "Adjustable": true,
+            "GlobalQuota": false
+        },
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaCode": "L-00000005",
+            "QuotaName": "Model invocation max tokens per day for Anthropic Claude Sonnet 4.5",
+            "Value": 288000000.0,
+            "Unit": "None",
+            "Adjustable": false,
+            "GlobalQuota": false
+        }
+    ],
+    "NextToken": "page-2-token"
+}

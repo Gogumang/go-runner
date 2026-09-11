@@ -1,0 +1,1 @@
+{"receivedAt":1789095600,"payload":{"session_id":"test-session","model":{"id":"claude-opus-5","display_name":"Opus 5"},"cost":{"total_cost_usd":0.42},"rate_limits":{"five_hour":{"used_percentage":23.5,"resets_at":1789106400},"seven_day":{"used_percentage":41.2,"resets_at":1789500000}}}}

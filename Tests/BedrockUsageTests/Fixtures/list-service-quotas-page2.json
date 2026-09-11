@@ -1,0 +1,34 @@
+{
+    "Quotas": [
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaCode": "L-00000006",
+            "QuotaName": "On-demand model inference tokens per minute for Amazon Nova Pro",
+            "Value": 1000000.0,
+            "Unit": "None",
+            "Adjustable": true,
+            "GlobalQuota": false
+        },
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaCode": "L-00000007",
+            "QuotaName": "Batch inference job size (in GB) for Amazon Nova Pro",
+            "Value": 5.0,
+            "Unit": "None",
+            "Adjustable": false,
+            "GlobalQuota": false
+        },
+        {
+            "ServiceCode": "bedrock",
+            "ServiceName": "Amazon Bedrock",
+            "QuotaCode": "L-00000008",
+            "QuotaName": "Global cross-Region model inference tokens per minute for Anthropic Claude Opus 5",
+            "Value": 3000000.0,
+            "Unit": "None",
+            "Adjustable": true,
+            "GlobalQuota": false
+        }
+    ]
+}

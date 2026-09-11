@@ -1,0 +1,38 @@
+{
+    "Metrics": [
+        {
+            "Namespace": "AWS/Bedrock",
+            "MetricName": "InputTokenCount",
+            "Dimensions": [
+                { "Name": "ModelId", "Value": "us.anthropic.claude-sonnet-4-5-20250929-v1:0" }
+            ]
+        },
+        {
+            "Namespace": "AWS/Bedrock",
+            "MetricName": "InputTokenCount",
+            "Dimensions": [
+                { "Name": "ModelId", "Value": "amazon.nova-pro-v1:0" }
+            ]
+        },
+        {
+            "Namespace": "AWS/Bedrock",
+            "MetricName": "InputTokenCount",
+            "Dimensions": [
+                { "Name": "ModelId", "Value": "meta.llama3-1-70b-instruct-v1:0" }
+            ]
+        },
+        {
+            "Namespace": "AWS/Bedrock",
+            "MetricName": "InputTokenCount",
+            "Dimensions": [
+                { "Name": "ModelId", "Value": "us.anthropic.claude-sonnet-4-5-20250929-v1:0" },
+                { "Name": "ServiceTier", "Value": "standard" }
+            ]
+        },
+        {
+            "Namespace": "AWS/Bedrock",
+            "MetricName": "InputTokenCount",
+            "Dimensions": []
+        }
+    ]
+}

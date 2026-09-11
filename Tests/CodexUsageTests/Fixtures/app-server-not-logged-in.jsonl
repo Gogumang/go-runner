@@ -1,0 +1,4 @@
+{"id":1,"result":{"userAgent":"gorunner/0.153.0 (Mac OS 15.6.0; arm64) (gorunner; 0.1.0)","codexHome":"/Users/example/.codex","platformFamily":"unix","platformOs":"macos"}}
+{"method":"remoteControl/status/changed","params":{"status":"disabled","serverName":"example.local","installationId":"00000000-0000-0000-0000-000000000000","environmentId":null},"emittedAtMs":1789091052004}
+{"error":{"code":-32600,"message":"codex account authentication required to read rate limits"},"id":3}
+{"id":2,"result":{"account":null,"requiresOpenaiAuth":true}}
