@@ -40,6 +40,9 @@ public struct AppSettings: Codable, Equatable, Sendable {
     /// macOS notification when Slack's Dock badge count goes up (needs Accessibility permission).
     public var notifyOnSlackMessage = true
 
+    // Device trust (collector / grep-admin, see DeviceTrustSettings.swift)
+    public var deviceTrust = DeviceTrustSettings()
+
     public init() {}
 
     public var metricsOptions: MetricsOptions {

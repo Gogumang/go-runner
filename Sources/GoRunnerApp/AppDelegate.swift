@@ -56,6 +56,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self?.quota.stop()
             self?.agentWatcher?.stop()
             self?.slackNotifier.stop()
+            self?.model.deviceTrust.stop()
         }
 
         statusItem.start()
@@ -81,6 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         quota.stop()
         agentWatcher?.stop()
         slackNotifier.stop()
+        model.deviceTrust.stop()
     }
 
     /// Claude Code / Codex finish notifications (drop toggles whose hook disappeared, then watch the events file) and

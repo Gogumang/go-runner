@@ -33,6 +33,7 @@ When several agents build at once, use a private scratch path to avoid the `.bui
 | `ClaudeUsage` | `ClaudeUsageProvider`, `ClaudeStatuslineInstaller` | Core |
 | `CodexUsage` | `CodexUsageProvider` | Core |
 | `BedrockUsage` | `BedrockUsageProvider`, `AWSProfiles` | Core |
+| `DeviceTrust` | Secure Enclave device key (`AppPaths.deviceSigningKeyFile`), JWK thumbprint, DPoP proofs, `DeviceTrustClient` for the collector's `/api/device/sessions` and `/api/device/heartbeat` ("어드민 열기") | Core |
 | `GoRunnerApp` | app shell: status item, status menu, settings, quota coordinator, smoke test, uninstall, `LegacyInstallCleanup` (removes pre-rename RunAX installs at launch) | all |
 
 Files marked `FACADE` define public API used by other targets — keep those signatures.

@@ -1,0 +1,104 @@
+// "어드민 열기": proves this Mac to the collector with its Secure Enclave key, hands the one-time code to grep-admin in the
+// browser, then keeps the device session alive with heartbeats. Contract: collector <-> go-runner <-> grep-admin device trust.
+
+import AppKit
+import DeviceTrust
+import GoRunnerCore
+
+@MainActor
+final class DeviceTrustController: ObservableObject {
+    /// The collector invalidates a device's sessions after 3 minutes without a heartbeat, so 60 s leaves two retries.
+    static let heartbeatIntervalSeconds: UInt64 = 60
+    /// Matches the collector's absolute device-session lifetime; heartbeats after that would keep nothing alive.
+    static let heartbeatDuration: TimeInterval = 12 * 60 * 60
+
+    @Published private(set) var thumbprint: String?
+    @Published private(set) var thumbprintError: String?
+    @Published private(set) var isOpeningAdmin = false
+
+    private let settingsStore: SettingsStore
+    private let client: DeviceTrustClient
+    private let keyStore: SecureEnclaveDeviceKeyStore
+    private var heartbeatTask: Task<Void, Never>?
+
+    init(settingsStore: SettingsStore, client: DeviceTrustClient = .live, keyStore: SecureEnclaveDeviceKeyStore = .standard) {
+        self.settingsStore = settingsStore
+        self.client = client
+        self.keyStore = keyStore
+    }
+
+    var isAdminConfigured: Bool { settingsStore.settings.deviceTrust.isAdminConfigured }
+
+    /// Creates the Secure Enclave key on first call.
+    func loadThumbprint() {
+        guard thumbprint == nil else { return }
+        do {
+            thumbprint = try keyStore.loadOrCreateSigner().publicJWK.thumbprint
+            thumbprintError = nil
+        } catch {
+            thumbprintError = error.localizedDescription
+            Log.app.error("Device thumbprint unavailable: \(error.localizedDescription, privacy: .public)")
+        }
+    }
+
+    func copyThumbprint() {
+        guard let thumbprint else { return }
+        NSPasteboard.general.clearContents()
+        NSPasteboard.general.setString(thumbprint, forType: .string)
+    }
+
+    func openAdmin() {
+        guard !isOpeningAdmin else { return }
+        isOpeningAdmin = true
+        let addresses = settingsStore.settings.deviceTrust
+        let client = client
+        Task { @MainActor in
+            defer { isOpeningAdmin = false }
+            do {
+                let handoff = try await client.openSession(collectorBaseURL: addresses.collectorBaseURL)
+                let url = try DeviceTrustEndpoints.adminConnectURL(adminBase: addresses.adminBaseURL, handoffCode: handoff.handoffCode)
+                NSWorkspace.shared.open(url)
+                startHeartbeats(collectorBaseURL: addresses.collectorBaseURL)
+            } catch {
+                Log.app.error("Open admin failed: \(error.localizedDescription, privacy: .public)")
+                showError(error)
+            }
+        }
+    }
+
+    /// Restarts the 12-hour window on every successful "어드민 열기". Failures are only logged: a missed heartbeat
+    /// is auxiliary, and the admin page itself tells the user to reopen when the session is gone.
+    private func startHeartbeats(collectorBaseURL: String) {
+        heartbeatTask?.cancel()
+        let client = client
+        let interval = Self.heartbeatIntervalSeconds
+        let deadline = Date().addingTimeInterval(Self.heartbeatDuration)
+        heartbeatTask = Task.detached(priority: .utility) {
+            while !Task.isCancelled {
+                try? await Task.sleep(nanoseconds: interval * 1_000_000_000)
+                guard !Task.isCancelled, Date() < deadline else { break }
+                do {
+                    try await client.sendHeartbeat(collectorBaseURL: collectorBaseURL)
+                } catch {
+                    Log.app.error("Device heartbeat failed: \(error.localizedDescription, privacy: .public)")
+                }
+            }
+            Log.app.info("Device heartbeats stopped")
+        }
+    }
+
+    func stop() {
+        heartbeatTask?.cancel()
+        heartbeatTask = nil
+    }
+
+    private func showError(_ error: Error) {
+        let alert = NSAlert()
+        alert.alertStyle = .warning
+        alert.messageText = Loc.t("어드민을 열지 못했습니다", "Couldn't open the admin")
+        alert.informativeText = error.localizedDescription
+        alert.addButton(withTitle: Loc.t("확인", "OK"))
+        NSApp.activate(ignoringOtherApps: true)
+        alert.runModal()
+    }
+}

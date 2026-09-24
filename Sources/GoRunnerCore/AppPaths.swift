@@ -33,6 +33,10 @@ public enum AppPaths {
     /// Agent finish events appended by `gorunner-agent-event` (one JSON object per line; no prompts or messages).
     public static var agentEventsFile: URL { applicationSupport.appendingPathComponent("agent-events.jsonl") }
 
+    /// Secure Enclave-wrapped device signing key (`SecureEnclave.P256.Signing.PrivateKey.dataRepresentation`).
+    /// The blob is only usable by this Mac's Secure Enclave; it is removed with `applicationSupport` on uninstall.
+    public static var deviceSigningKeyFile: URL { applicationSupport.appendingPathComponent("device-signing-key.bin") }
+
     /// Last good provider snapshots (no secrets).
     public static var quotaCacheFile: URL { cacheDirectory.appendingPathComponent("quota-cache.json") }
 

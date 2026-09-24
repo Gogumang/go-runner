@@ -8,6 +8,7 @@
 //   ClaudeUsage    Claude usage provider (statusline hook, OAuth usage opt-in, local JSONL logs)
 //   CodexUsage     Codex usage provider (codex app-server, session logs)
 //   BedrockUsage   AWS Bedrock usage provider (CloudWatch, Service Quotas, Cost Explorer via aws CLI)
+//   DeviceTrust    Secure Enclave device key, DPoP proofs, collector device-session client ("어드민 열기")
 //   GoRunnerApp       AppKit/SwiftUI app shell (status item, status menu, settings, uninstall)
 import PackageDescription
 
@@ -25,9 +26,10 @@ let package = Package(
         .target(name: "ClaudeUsage", dependencies: ["GoRunnerCore"]),
         .target(name: "CodexUsage", dependencies: ["GoRunnerCore"]),
         .target(name: "BedrockUsage", dependencies: ["GoRunnerCore"]),
+        .target(name: "DeviceTrust", dependencies: ["GoRunnerCore"]),
         .executableTarget(
             name: "GoRunnerApp",
-            dependencies: ["GoRunnerCore", "SystemMetrics", "RunnerKit", "RunnerArt", "ClaudeUsage", "CodexUsage", "BedrockUsage"]
+            dependencies: ["GoRunnerCore", "SystemMetrics", "RunnerKit", "RunnerArt", "ClaudeUsage", "CodexUsage", "BedrockUsage", "DeviceTrust"]
         ),
         .testTarget(name: "GoRunnerCoreTests", dependencies: ["GoRunnerCore"]),
         .testTarget(name: "SystemMetricsTests", dependencies: ["SystemMetrics"]),
@@ -37,6 +39,7 @@ let package = Package(
         .testTarget(name: "ClaudeUsageTests", dependencies: ["ClaudeUsage"], exclude: ["Fixtures"]),
         .testTarget(name: "CodexUsageTests", dependencies: ["CodexUsage"], exclude: ["Fixtures"]),
         .testTarget(name: "BedrockUsageTests", dependencies: ["BedrockUsage"], exclude: ["Fixtures"]),
+        .testTarget(name: "DeviceTrustTests", dependencies: ["DeviceTrust"]),
     ],
     swiftLanguageModes: [.v5]
 )

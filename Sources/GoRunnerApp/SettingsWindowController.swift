@@ -126,7 +126,7 @@ struct SettingsRootView: View {
     private func pane(_ tab: SettingsTab) -> some View {
         switch tab {
         case .general:
-            GeneralSettingsTab(store: model.settingsStore)
+            GeneralSettingsTab(store: model.settingsStore, deviceTrust: model.deviceTrust)
         case .runner:
             RunnerSettingsTab(model: model, store: model.settingsStore)
         case .system:
