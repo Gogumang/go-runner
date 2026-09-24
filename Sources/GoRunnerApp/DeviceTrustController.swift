@@ -15,6 +15,7 @@ final class DeviceTrustController: ObservableObject {
     @Published private(set) var thumbprint: String?
     @Published private(set) var thumbprintError: String?
     @Published private(set) var isOpeningAdmin = false
+    @Published private(set) var connection: AdminConnection = .disconnected
     @Published private(set) var isRequestingEnrollment = false
     /// Result line under the "이 Mac 등록 요청" button; nil until the first request.
     @Published private(set) var enrollmentMessage: String?
@@ -51,6 +52,8 @@ final class DeviceTrustController: ObservableObject {
     func openAdmin() {
         guard !isOpeningAdmin else { return }
         isOpeningAdmin = true
+        let previousConnection = connection
+        connection = .connecting
         let addresses = settingsStore.settings.deviceTrust
         let client = client
         Task { @MainActor in
@@ -59,8 +62,11 @@ final class DeviceTrustController: ObservableObject {
                 let handoff = try await client.openSession(collectorBaseURL: addresses.effectiveCollectorBaseURL)
                 let url = try DeviceTrustEndpoints.adminConnectURL(adminBase: addresses.effectiveAdminBaseURL, handoffCode: handoff.handoffCode)
                 NSWorkspace.shared.open(url)
+                connection = .connected(lastSignalAt: Date())
                 startHeartbeats(collectorBaseURL: addresses.effectiveCollectorBaseURL)
             } catch {
+                // Heartbeats from an earlier session may still be running; don't claim it dropped because a reopen failed.
+                connection = previousConnection
                 Log.app.error("Open admin failed: \(error.localizedDescription, privacy: .public)")
                 showError(error)
             }
@@ -91,30 +97,55 @@ final class DeviceTrustController: ObservableObject {
         }
     }
 
-    /// Restarts the 12-hour window on every successful "어드민 열기". Failures are only logged: a missed heartbeat
-    /// is auxiliary, and the admin page itself tells the user to reopen when the session is gone.
+    /// Restarts the 12-hour window on every successful "어드민 열기". A failed heartbeat is not alerted (the admin page
+    /// says to reopen when the session is gone); it only turns the menu's connection row red until the next success.
     private func startHeartbeats(collectorBaseURL: String) {
         heartbeatTask?.cancel()
         let client = client
         let interval = Self.heartbeatIntervalSeconds
         let deadline = Date().addingTimeInterval(Self.heartbeatDuration)
-        heartbeatTask = Task.detached(priority: .utility) {
+        heartbeatTask = Task.detached(priority: .utility) { [weak self] in
             while !Task.isCancelled {
                 try? await Task.sleep(nanoseconds: interval * 1_000_000_000)
                 guard !Task.isCancelled, Date() < deadline else { break }
                 do {
                     try await client.sendHeartbeat(collectorBaseURL: collectorBaseURL)
+                    await self?.recordHeartbeat(failure: nil)
                 } catch {
                     Log.app.error("Device heartbeat failed: \(error.localizedDescription, privacy: .public)")
+                    await self?.recordHeartbeat(failure: error.localizedDescription)
                 }
             }
+            if !Task.isCancelled { await self?.markDisconnected() }
             Log.app.info("Device heartbeats stopped")
         }
+    }
+
+    private func recordHeartbeat(failure: String?) {
+        guard !Task.isCancelled else { return }
+        switch (failure, connection) {
+        case (nil, _):
+            connection = .connected(lastSignalAt: Date())
+        case (let reason?, .connected(let lastSignalAt)), (let reason?, .unstable(let lastSignalAt, _)):
+            connection = .unstable(lastSignalAt: lastSignalAt, reason: reason)
+        case (_?, _):
+            break
+        }
+    }
+
+    private func markDisconnected() {
+        connection = .disconnected
+    }
+
+    /// Stops heartbeats; the collector closes this Mac's admin sessions within 3 minutes.
+    func disconnect() {
+        stop()
     }
 
     func stop() {
         heartbeatTask?.cancel()
         heartbeatTask = nil
+        connection = .disconnected
     }
 
     private func showError(_ error: Error) {

@@ -3,6 +3,7 @@
 // which is Liquid Glass on macOS 26 because the app is built with the macOS 26 SDK.
 
 import AppKit
+import DeviceTrust
 import GoRunnerCore
 import SwiftUI
 
@@ -57,6 +58,8 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
         menu.removeAllItems()
         let settings = model.settingsStore.settings
 
+        addAdminSection()
+        menu.addItem(.separator())
         menu.addItem(.sectionHeader(title: Loc.t("시스템", "System")))
         menu.addItem(hostedItem(SystemGaugesView(model: model, store: model.settingsStore,
                                                  onTap: closeMenu { $0.openActivityMonitor() })))
@@ -82,14 +85,40 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
         runners.submenu = runnerMenu()
         menu.addItem(runners)
         menu.addItem(makeItem(Loc.t("설정…", "Settings…"), symbol: "gearshape", action: #selector(openSettings), key: ","))
-        let openAdmin = makeItem(Loc.t("어드민 열기", "Open Admin"), symbol: "lock.shield", action: #selector(openAdmin))
-        openAdmin.isEnabled = !model.deviceTrust.isOpeningAdmin
-        menu.addItem(openAdmin)
         menu.addItem(makeItem(Loc.t("AI 사용량 새로고침", "Refresh AI Usage"), symbol: "arrow.clockwise",
                               action: #selector(refreshQuota), key: "r"))
         menu.addItem(.separator())
         menu.addItem(makeItem(Loc.t("\(AppDisplayName.current) 종료", "Quit \(AppDisplayName.current)"), symbol: "power",
                               action: #selector(quit), key: "q"))
+    }
+
+    /// 어드민: connection state on top of the menu. Clicking the row connects (or reopens the admin when connected).
+    private func addAdminSection() {
+        let deviceTrust = model.deviceTrust
+        menu.addItem(.sectionHeader(title: Loc.t("어드민", "Admin")))
+        let row = makeItem(deviceTrust.connection.title(now: Date()), symbol: nil, action: #selector(openAdmin))
+        row.image = Self.connectionDot(deviceTrust.connection.tone)
+        row.isEnabled = !deviceTrust.isOpeningAdmin
+        if case .unstable(_, let reason) = deviceTrust.connection {
+            row.toolTip = reason
+        }
+        menu.addItem(row)
+        if deviceTrust.connection.isConnected {
+            menu.addItem(makeItem(Loc.t("어드민 열기", "Open Admin"), symbol: "safari", action: #selector(openAdmin)))
+            menu.addItem(makeItem(Loc.t("연결 끊기", "Disconnect"), symbol: "xmark.circle", action: #selector(disconnectAdmin)))
+        }
+    }
+
+    private static func connectionDot(_ tone: AdminConnection.Tone) -> NSImage? {
+        let color: NSColor = switch tone {
+        case .neutral: .tertiaryLabelColor
+        case .pending: .systemYellow
+        case .good: .systemGreen
+        case .bad: .systemRed
+        }
+        let configuration = NSImage.SymbolConfiguration(pointSize: 9, weight: .regular)
+            .applying(NSImage.SymbolConfiguration(paletteColors: [color]))
+        return NSImage(systemSymbolName: "circle.fill", accessibilityDescription: nil)?.withSymbolConfiguration(configuration)
     }
 
     private func hostedItem<Content: View>(_ content: Content) -> NSMenuItem {
@@ -179,6 +208,7 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
     @objc private func openRunnerSettings() { model.openSettings(tab: .runner) }
     @objc private func openSettings() { model.openSettings() }
     @objc private func openAdmin() { model.deviceTrust.openAdmin() }
+    @objc private func disconnectAdmin() { model.deviceTrust.disconnect() }
     @objc private func refreshQuota() { model.quota.refresh() }
     @objc private func quit() { model.quit() }
 
