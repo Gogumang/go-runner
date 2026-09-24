@@ -35,6 +35,13 @@ public struct DeviceTrustClient: Sendable {
         try DeviceTrustResponseParser.parseHeartbeat(status: status, body: body)
     }
 
+    /// POST /api/device/enrollments. Asks to add this Mac; an already registered Mac on the admin 기기 page must approve it.
+    public func requestEnrollment(collectorBaseURL: String, deviceName: String) async throws -> DeviceEnrollmentStatus {
+        let body = try JSONSerialization.data(withJSONObject: ["name": deviceName])
+        let (status, response) = try await post(collectorBaseURL: collectorBaseURL, path: DeviceTrustEndpoints.enrollmentsPath, body: body)
+        return try DeviceTrustResponseParser.parseEnrollment(status: status, body: response)
+    }
+
     func makeRequest(collectorBaseURL: String, path: String) throws -> URLRequest {
         let url = try DeviceTrustEndpoints.url(base: collectorBaseURL, path: path)
         let proof = try DPoPProof.make(signer: try loadSigner(), method: Self.method, url: url, jti: makeJTI(), issuedAt: now())
@@ -47,8 +54,12 @@ public struct DeviceTrustClient: Sendable {
         return request
     }
 
-    private func post(collectorBaseURL: String, path: String) async throws -> (Int, Data) {
-        let request = try makeRequest(collectorBaseURL: collectorBaseURL, path: path)
+    private func post(collectorBaseURL: String, path: String, body: Data? = nil) async throws -> (Int, Data) {
+        var request = try makeRequest(collectorBaseURL: collectorBaseURL, path: path)
+        if let body {
+            request.httpBody = body
+            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        }
         do {
             let (data, response) = try await transport(request)
             return ((response as? HTTPURLResponse)?.statusCode ?? 0, data)

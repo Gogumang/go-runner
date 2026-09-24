@@ -15,6 +15,9 @@ final class DeviceTrustController: ObservableObject {
     @Published private(set) var thumbprint: String?
     @Published private(set) var thumbprintError: String?
     @Published private(set) var isOpeningAdmin = false
+    @Published private(set) var isRequestingEnrollment = false
+    /// Result line under the "이 Mac 등록 요청" button; nil until the first request.
+    @Published private(set) var enrollmentMessage: String?
 
     private let settingsStore: SettingsStore
     private let client: DeviceTrustClient
@@ -60,6 +63,30 @@ final class DeviceTrustController: ObservableObject {
             } catch {
                 Log.app.error("Open admin failed: \(error.localizedDescription, privacy: .public)")
                 showError(error)
+            }
+        }
+    }
+
+    /// Asks the collector to add this Mac. Nothing opens until an already registered Mac approves it on the admin 기기 page.
+    func requestEnrollment() {
+        guard !isRequestingEnrollment else { return }
+        isRequestingEnrollment = true
+        let collectorBaseURL = settingsStore.settings.deviceTrust.effectiveCollectorBaseURL
+        let deviceName = Host.current().localizedName ?? "Mac"
+        let client = client
+        Task { @MainActor in
+            defer { isRequestingEnrollment = false }
+            do {
+                switch try await client.requestEnrollment(collectorBaseURL: collectorBaseURL, deviceName: deviceName) {
+                case .registered:
+                    enrollmentMessage = Loc.t("이미 등록된 Mac이에요. 메뉴의 '어드민 열기'를 쓰면 돼요.",
+                                              "This Mac is already registered. Use 'Open Admin' in the menu.")
+                case .pending:
+                    enrollmentMessage = Loc.t("요청했어요. 등록된 Mac에서 어드민 → 관리 → 기기를 열어 10분 안에 승인하세요.",
+                                              "Requested. Approve it within 10 minutes from a registered Mac: Admin > 관리 > 기기.")
+                }
+            } catch {
+                enrollmentMessage = error.localizedDescription
             }
         }
     }

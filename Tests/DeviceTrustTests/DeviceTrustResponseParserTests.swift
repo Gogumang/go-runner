@@ -47,3 +47,23 @@ struct DeviceTrustResponseParserTests {
         #expect(error?.errorDescription?.contains("COLLECTOR_DEVICE_KEYS") == true, "description: \(String(describing: error?.errorDescription))")
     }
 }
+
+struct DeviceEnrollmentParserTests {
+    @Test("202 pending 과 200 registered 를 구분한다") func distinguishesPendingAndRegistered() throws {
+        #expect(try DeviceTrustResponseParser.parseEnrollment(status: 202, body: Data(#"{"status":"pending","thumbprint":"t"}"#.utf8)) == .pending)
+        #expect(try DeviceTrustResponseParser.parseEnrollment(status: 200, body: Data(#"{"status":"registered","thumbprint":"t"}"#.utf8)) == .registered)
+    }
+
+    @Test("모르는 status 는 잘못된 응답이다") func unknownStatusIsMalformed() {
+        #expect(throws: DeviceTrustError.malformedResponse) {
+            try DeviceTrustResponseParser.parseEnrollment(status: 202, body: Data(#"{"status":"approved"}"#.utf8))
+        }
+    }
+
+    @Test("요청이 너무 많으면 collector 오류로 올린다") func tooManyRequestsIsCollectorError() {
+        let body = Data(#"{"error":"too_many_enrollment_requests","message":"대기 중인 등록 요청이 너무 많습니다"}"#.utf8)
+        #expect(throws: DeviceTrustError.collector(code: .other("too_many_enrollment_requests"), message: "대기 중인 등록 요청이 너무 많습니다", status: 429)) {
+            try DeviceTrustResponseParser.parseEnrollment(status: 429, body: body)
+        }
+    }
+}

@@ -3,6 +3,7 @@ import Foundation
 public enum DeviceTrustEndpoints {
     public static let sessionsPath = "/api/device/sessions"
     public static let heartbeatPath = "/api/device/heartbeat"
+    public static let enrollmentsPath = "/api/device/enrollments"
     public static let adminConnectPath = "/device/connect"
 
     /// Base URL plus path. The result is also the DPoP `htu`, so the base is normalized to have no trailing slash,

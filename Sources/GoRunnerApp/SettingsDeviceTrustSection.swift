@@ -33,8 +33,16 @@ struct DeviceTrustSettingsSection: View {
                     ProgressView().controlSize(.small)
                 }
             }
-            SettingsCaption(Loc.t("이 Mac의 Secure Enclave 키 지문이에요. collector의 COLLECTOR_DEVICE_KEYS에 쉼표로 추가해야 메뉴의 '어드민 열기'가 동작해요.",
-                                  "This Mac's Secure Enclave key fingerprint. Add it (comma-separated) to the collector's COLLECTOR_DEVICE_KEYS so 'Open Admin' in the menu works."))
+            LabeledContent(Loc.t("기기 등록", "Registration")) {
+                Button(Loc.t("이 Mac 등록 요청", "Request Registration")) { deviceTrust.requestEnrollment() }
+                    .controlSize(.small)
+                    .disabled(deviceTrust.isRequestingEnrollment)
+            }
+            if let message = deviceTrust.enrollmentMessage {
+                SettingsCaption(message)
+            }
+            SettingsCaption(Loc.t("thumbprint는 이 Mac의 Secure Enclave 키 지문이에요. 등록을 요청한 뒤, 이미 등록된 Mac에서 어드민 → 관리 → 기기를 열어 thumbprint가 같은지 확인하고 승인하세요.",
+                                  "The thumbprint is this Mac's Secure Enclave key fingerprint. After requesting, approve it from an already registered Mac (Admin > 관리 > 기기), checking the thumbprint matches."))
         }
         .onAppear { deviceTrust.loadThumbprint() }
     }

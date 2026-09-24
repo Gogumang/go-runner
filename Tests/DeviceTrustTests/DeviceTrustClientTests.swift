@@ -46,6 +46,25 @@ struct DeviceTrustClientTests {
         #expect(payload["iat"] as? Int == 1_790_000_000)
     }
 
+    @Test("등록 요청은 이름을 JSON 본문에 싣고 등록 경로를 htu로 쓴다") func enrollmentSendsNameAndUsesEnrollmentHTU() async throws {
+        // Arrange
+        let recorder = RequestRecorder()
+        let client = try makeClient(status: 202, body: #"{"status":"pending","thumbprint":"t"}"#, recorder: recorder)
+
+        // Act
+        let status = try await client.requestEnrollment(collectorBaseURL: "https://airflow.gogumang.com/collector", deviceName: "회사 맥북")
+
+        // Assert
+        #expect(status == .pending)
+        let request = try #require(recorder.requests.first)
+        #expect(request.url?.absoluteString == "https://airflow.gogumang.com/collector/api/device/enrollments")
+        #expect(request.value(forHTTPHeaderField: "Content-Type") == "application/json")
+        let sent = try #require(request.httpBody.flatMap { try? JSONSerialization.jsonObject(with: $0) as? [String: String] })
+        #expect(sent["name"] == "회사 맥북")
+        let payload = try jsonObject(try #require(request.value(forHTTPHeaderField: "DPoP")).split(separator: ".")[1])
+        #expect(payload["htu"] as? String == "https://airflow.gogumang.com/collector/api/device/enrollments")
+    }
+
     @Test("heartbeat는 heartbeat 경로를 htu로 쓴다") func heartbeatUsesHeartbeatHTU() async throws {
         let recorder = RequestRecorder()
         let client = try makeClient(status: 204, body: "", recorder: recorder)
