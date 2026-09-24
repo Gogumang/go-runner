@@ -83,10 +83,7 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
         menu.addItem(runners)
         menu.addItem(makeItem(Loc.t("설정…", "Settings…"), symbol: "gearshape", action: #selector(openSettings), key: ","))
         let openAdmin = makeItem(Loc.t("어드민 열기", "Open Admin"), symbol: "lock.shield", action: #selector(openAdmin))
-        openAdmin.isEnabled = settings.deviceTrust.isAdminConfigured && !model.deviceTrust.isOpeningAdmin
-        if !settings.deviceTrust.isAdminConfigured {
-            openAdmin.toolTip = Loc.t("설정 > 일반 > 기기 신뢰에서 어드민 주소를 입력하세요", "Enter the admin address in Settings > General > Device Trust")
-        }
+        openAdmin.isEnabled = !model.deviceTrust.isOpeningAdmin
         menu.addItem(openAdmin)
         menu.addItem(makeItem(Loc.t("AI 사용량 새로고침", "Refresh AI Usage"), symbol: "arrow.clockwise",
                               action: #selector(refreshQuota), key: "r"))

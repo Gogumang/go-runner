@@ -27,8 +27,6 @@ final class DeviceTrustController: ObservableObject {
         self.keyStore = keyStore
     }
 
-    var isAdminConfigured: Bool { settingsStore.settings.deviceTrust.isAdminConfigured }
-
     /// Creates the Secure Enclave key on first call.
     func loadThumbprint() {
         guard thumbprint == nil else { return }
@@ -55,10 +53,10 @@ final class DeviceTrustController: ObservableObject {
         Task { @MainActor in
             defer { isOpeningAdmin = false }
             do {
-                let handoff = try await client.openSession(collectorBaseURL: addresses.collectorBaseURL)
-                let url = try DeviceTrustEndpoints.adminConnectURL(adminBase: addresses.adminBaseURL, handoffCode: handoff.handoffCode)
+                let handoff = try await client.openSession(collectorBaseURL: addresses.effectiveCollectorBaseURL)
+                let url = try DeviceTrustEndpoints.adminConnectURL(adminBase: addresses.effectiveAdminBaseURL, handoffCode: handoff.handoffCode)
                 NSWorkspace.shared.open(url)
-                startHeartbeats(collectorBaseURL: addresses.collectorBaseURL)
+                startHeartbeats(collectorBaseURL: addresses.effectiveCollectorBaseURL)
             } catch {
                 Log.app.error("Open admin failed: \(error.localizedDescription, privacy: .public)")
                 showError(error)

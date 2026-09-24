@@ -12,7 +12,7 @@ struct DeviceTrustSettingsSection: View {
             TextField(Loc.t("collector 주소", "Collector address"), text: $store.settings.deviceTrust.collectorBaseURL,
                       prompt: Text(verbatim: DeviceTrustSettings.defaultCollectorBaseURL))
             TextField(Loc.t("어드민 주소", "Admin address"), text: $store.settings.deviceTrust.adminBaseURL,
-                      prompt: Text(verbatim: "https://admin.example.com"))
+                      prompt: Text(verbatim: DeviceTrustSettings.defaultAdminBaseURL))
             LabeledContent(Loc.t("기기 thumbprint", "Device thumbprint")) {
                 if let thumbprint = deviceTrust.thumbprint {
                     HStack(spacing: 6) {
