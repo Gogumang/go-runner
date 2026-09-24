@@ -3,7 +3,7 @@ import Foundation
 /// Addresses used by the device-trust flow ("어드민 열기"). The device key itself lives in `AppPaths.deviceSigningKeyFile`.
 public struct DeviceTrustSettings: Codable, Equatable, Sendable {
     public static let defaultCollectorBaseURL = "https://airflow.gogumang.com/collector"
-    public static let defaultAdminBaseURL = "https://grep-admin.vercel.app"
+    public static let defaultAdminBaseURL = "https://grep-admin.gogumang.com"
 
     /// Collector base URL without a trailing slash; the DPoP `htu` is this plus the endpoint path.
     public var collectorBaseURL = DeviceTrustSettings.defaultCollectorBaseURL
