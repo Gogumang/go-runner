@@ -6,12 +6,11 @@ import Foundation
 import GoRunnerCore
 
 /// Schedules provider refreshes, merges results with the on-disk cache and publishes reports for the UI.
-/// To save battery there is no refresh timer: providers refresh when the menu opens (data older than a minute), and
-/// Claude also when its statusline record changes.
+/// To save battery there is no timer at all: providers refresh when the menu opens (data older than a minute), and
+/// Claude also when its statusline record changes, which a vnode watcher reports instead of a poll.
 @MainActor
 final class QuotaCoordinator: ObservableObject {
     static let fetchTimeout: TimeInterval = 35
-    static let statuslinePollInterval: TimeInterval = 15
 
     @Published private(set) var reports: [ProviderID: ProviderReport] = [:]
     @Published private(set) var isRefreshing = false
@@ -24,12 +23,11 @@ final class QuotaCoordinator: ObservableObject {
     private let providers: [ProviderID: any UsageProvider]
     private var quotaSettings: QuotaSettings
     private var cache: [ProviderID: QuotaSnapshot] = [:]
-    private var lastStatuslineMTime: Date?
     private var pendingSettingsRefresh: Set<ProviderID> = []
     private var started = false
     private var stopped = false
 
-    private var statuslineTimer: AnyCancellable?
+    private var statuslineWatcher: FileChangeWatcher?
     private var settingsDebounce: AnyCancellable?
     private var cancellables = Set<AnyCancellable>()
 
@@ -59,10 +57,11 @@ final class QuotaCoordinator: ObservableObject {
             staleProviders.insert(id)
         }
 
-        lastStatuslineMTime = Self.modificationDate(of: AppPaths.claudeStatuslineFile)
-        statuslineTimer = Timer.publish(every: Self.statuslinePollInterval, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in self?.checkStatuslineFile() }
+        let watcher = FileChangeWatcher(fileURL: AppPaths.claudeStatuslineFile) { [weak self] in
+            self?.statuslineFileChanged()
+        }
+        watcher.start()
+        statuslineWatcher = watcher
 
         settingsStore.$settings
             .map(\.quota)
@@ -74,7 +73,8 @@ final class QuotaCoordinator: ObservableObject {
 
     func stop() {
         stopped = true
-        statuslineTimer = nil
+        statuslineWatcher?.stop()
+        statuslineWatcher = nil
         settingsDebounce = nil
         cancellables.removeAll()
     }
@@ -143,13 +143,9 @@ final class QuotaCoordinator: ObservableObject {
         }
     }
 
-    private func checkStatuslineFile() {
-        let mtime = Self.modificationDate(of: AppPaths.claudeStatuslineFile)
-        defer { lastStatuslineMTime = mtime }
-        guard let mtime, mtime != lastStatuslineMTime else { return }
-        if quotaSettings.claudeEnabled, quotaSettings.claudeStatuslineSource {
-            refresh([.claude])
-        }
+    private func statuslineFileChanged() {
+        guard !stopped, quotaSettings.claudeEnabled, quotaSettings.claudeStatuslineSource else { return }
+        refresh([.claude])
     }
 
     private func quotaSettingsChanged(_ new: QuotaSettings) {
@@ -180,10 +176,6 @@ final class QuotaCoordinator: ObservableObject {
                 self.pendingSettingsRefresh = []
                 self.refresh(ids)
             }
-    }
-
-    private static func modificationDate(of url: URL) -> Date? {
-        (try? FileManager.default.attributesOfItem(atPath: url.path))?[.modificationDate] as? Date
     }
 }
 

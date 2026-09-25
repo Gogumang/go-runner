@@ -25,12 +25,15 @@ final class StatusItemController: NSObject {
     private var reduceMotion = false
     private var lowPowerMode = ProcessInfo.processInfo.isLowPowerModeEnabled
 
+    /// How often "random runner" swaps character.
+    static let randomRunnerInterval: TimeInterval = 600
+
     private var appliedSpeed: Double?
     private var appliedPaused: Bool?
     private var appliedTitleKey: String?
     private var appliedAccessibilityLabel: String?
 
-    private var randomTimer: AnyCancellable?
+    private var randomTimer: Timer?
     private var cancellables = Set<AnyCancellable>()
 
     var button: NSStatusBarButton? { statusItem.button }
@@ -185,11 +188,17 @@ final class StatusItemController: NSObject {
     }
 
     private func updateRandomTimer() {
+        randomTimer?.invalidate()
         randomTimer = nil
         guard settings.randomRunnerEnabled else { return }
-        randomTimer = Timer.publish(every: 600, on: .main, in: .common)
-            .autoconnect()
-            .sink { [weak self] _ in self?.pickRandomRunner() }
+        let timer = Timer(timeInterval: Self.randomRunnerInterval, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated { self?.pickRandomRunner() }
+        }
+        // Nothing depends on the exact minute, so let the kernel coalesce this wake-up with other timers
+        // instead of waking the CPU on its own every 10 minutes.
+        timer.tolerance = Self.randomRunnerInterval / 4
+        RunLoop.main.add(timer, forMode: .common)
+        randomTimer = timer
     }
 
     private func pickRandomRunner() {
