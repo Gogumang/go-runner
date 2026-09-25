@@ -39,6 +39,10 @@ public struct AppSettings: Codable, Equatable, Sendable {
     public var notifyOnCodexFinish = false
     /// macOS notification when Slack's Dock badge count goes up (needs Accessibility permission).
     public var notifyOnSlackMessage = true
+    /// Whether the system Accessibility prompt has already been shown once. The permission is only ever
+    /// granted in System Settings, so re-asking on every launch only nags; the settings window keeps a
+    /// button for people who dismissed it. Reset when the Slack toggle is switched back on.
+    public var hasAskedForAccessibility = false
 
     // Device trust (collector / grep-admin, see DeviceTrustSettings.swift)
     public var deviceTrust = DeviceTrustSettings()

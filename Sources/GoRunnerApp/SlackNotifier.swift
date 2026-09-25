@@ -218,10 +218,14 @@ final class SlackNotifier: ObservableObject {
         updatePolling()
     }
 
-    /// System prompt linking to Privacy & Security → Accessibility. At most once per launch.
+    /// System prompt linking to Privacy & Security → Accessibility. Shown once ever, not once per launch:
+    /// the answer is given in System Settings and does not change because the app restarted, so asking
+    /// again at every login is pure nagging. Switching the Slack toggle back on asks again (see
+    /// `enabledChanged`), and the settings window always offers the button.
     func promptForAccessibilityIfNeeded() {
-        guard !promptedThisLaunch, !AXIsProcessTrusted() else { return }
+        guard !promptedThisLaunch, !settingsStore.settings.hasAskedForAccessibility, !AXIsProcessTrusted() else { return }
         promptedThisLaunch = true
+        settingsStore.settings.hasAskedForAccessibility = true
         _ = AXIsProcessTrustedWithOptions(["AXTrustedCheckOptionPrompt": true] as CFDictionary)
     }
 
@@ -235,6 +239,10 @@ final class SlackNotifier: ObservableObject {
         enabled = value
         if value {
             refreshInstalled()
+            // Turning the toggle on is an explicit request for the feature, so ask again even if the
+            // one-time prompt was already spent.
+            promptedThisLaunch = false
+            settingsStore.settings.hasAskedForAccessibility = false
             promptForAccessibilityIfNeeded()
         } else {
             baseline = nil
