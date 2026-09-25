@@ -14,6 +14,7 @@ Manual test guide: `docs/TESTING.md`.
 | Build one target | `swift build --target <Target>` |
 | Tests | `swift test` (one target: `swift test --filter <Target>Tests`) |
 | App bundle | `./scripts/build-app.sh` → `build/go-runner.app` |
+| Disk image | `./scripts/build-dmg.sh` → `build/go-runner-<version>.dmg` (ad-hoc signed unless `GORUNNER_SIGN_IDENTITY`/`GORUNNER_NOTARY_PROFILE` are set) |
 | Run | `make run` |
 | Install to ~/Applications | `./scripts/install.sh` |
 | Uninstall everything | `./scripts/uninstall.sh` (`--dry-run`, `--yes`) |
