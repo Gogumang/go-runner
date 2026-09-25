@@ -19,7 +19,7 @@ struct Chip: View {
             .lineLimit(1)
             .padding(.horizontal, 5)
             .padding(.vertical, 1.5)
-            .background(Capsule().strokeBorder(tint.opacity(0.5), lineWidth: 0.5))
+            .glassBadge(tint: tint)
     }
 }
 

@@ -34,25 +34,21 @@ struct RunnerSettingsTab: View {
         return Button {
             model.selectRunner(runner.id)
         } label: {
-            VStack(spacing: 6) {
-                RunnerThumbnail(image: model.thumbnail(for: runner.id), isTemplate: runner.isTemplate, height: 28)
-                    .frame(height: 36)
-                Text(runner.displayName)
-                    .font(.system(size: 11, weight: selected ? .semibold : .regular))
-                    .lineLimit(1)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 10)
-            .padding(.horizontal, 6)
-            .background(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(selected ? Color.accentColor.opacity(0.14) : Color.primary.opacity(0.04))
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .strokeBorder(selected ? Color.accentColor : Color.primary.opacity(0.08), lineWidth: selected ? 2 : 1)
-            )
-            .overlay(alignment: .topTrailing) {
+            // The checkmark is a sibling, not an overlay on the card: anything layered onto a view that
+            // carries `.glassEffect` is composited into the material and comes back out blurred.
+            ZStack(alignment: .topTrailing) {
+                VStack(spacing: 6) {
+                    RunnerThumbnail(image: model.thumbnail(for: runner.id), isTemplate: runner.isTemplate, height: 28)
+                        .frame(height: 36)
+                    Text(runner.displayName)
+                        .font(.system(size: 11, weight: selected ? .semibold : .regular))
+                        .lineLimit(1)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 10)
+                .padding(.horizontal, 6)
+                .glassCard(selected: selected)
+
                 if selected {
                     Image(systemName: "checkmark.circle.fill")
                         .font(.system(size: 14))
