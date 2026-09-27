@@ -57,8 +57,6 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
         menu.removeAllItems()
         let settings = model.settingsStore.settings
 
-        addAdminSection()
-        menu.addItem(.separator())
         menu.addItem(.sectionHeader(title: Loc.t("시스템", "System")))
         menu.addItem(hostedItem(SystemGaugesView(model: model, store: model.settingsStore,
                                                  onTap: closeMenu { $0.openActivityMonitor() })))
@@ -89,12 +87,6 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
         menu.addItem(.separator())
         menu.addItem(makeItem(Loc.t("\(AppDisplayName.current) 종료", "Quit \(AppDisplayName.current)"), symbol: "power",
                               action: #selector(quit), key: "q"))
-    }
-
-    /// 어드민: opens grep-admin in the browser. Sign-in happens there (GitHub); the app no longer proves this Mac.
-    private func addAdminSection() {
-        menu.addItem(.sectionHeader(title: Loc.t("어드민", "Admin")))
-        menu.addItem(makeItem(Loc.t("어드민 열기", "Open Admin"), symbol: "safari", action: #selector(openAdmin)))
     }
 
     private func hostedItem<Content: View>(_ content: Content) -> NSMenuItem {
@@ -183,10 +175,6 @@ final class StatusMenuController: NSObject, NSMenuDelegate {
     @objc private func enableNotifications() { model.agentNotifier.enableNotifications() }
     @objc private func openRunnerSettings() { model.openSettings(tab: .runner) }
     @objc private func openSettings() { model.openSettings() }
-    @objc private func openAdmin() {
-        guard let url = URL(string: model.settingsStore.settings.deviceTrust.effectiveAdminBaseURL) else { return }
-        NSWorkspace.shared.open(url)
-    }
     @objc private func refreshQuota() { model.quota.refresh() }
     @objc private func quit() { model.quit() }
 

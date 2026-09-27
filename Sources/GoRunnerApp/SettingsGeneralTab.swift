@@ -65,8 +65,6 @@ struct GeneralSettingsTab: View {
                 }
             }
 
-            AdminSettingsSection(store: store)
-
             Section(Loc.t("초기화", "Reset")) {
                 Button(Loc.t("설정 초기화…", "Reset Settings…"), role: .destructive) {
                     confirmReset = true
