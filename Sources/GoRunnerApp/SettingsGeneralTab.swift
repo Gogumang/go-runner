@@ -42,7 +42,6 @@ final class LoginItemModel: ObservableObject {
 
 struct GeneralSettingsTab: View {
     @ObservedObject var store: SettingsStore
-    @ObservedObject var deviceTrust: DeviceTrustController
     @StateObject private var login = LoginItemModel()
     @State private var confirmReset = false
 
@@ -66,7 +65,7 @@ struct GeneralSettingsTab: View {
                 }
             }
 
-            DeviceTrustSettingsSection(store: store, deviceTrust: deviceTrust)
+            AdminSettingsSection(store: store)
 
             Section(Loc.t("초기화", "Reset")) {
                 Button(Loc.t("설정 초기화…", "Reset Settings…"), role: .destructive) {

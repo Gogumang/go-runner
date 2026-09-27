@@ -44,7 +44,7 @@ public struct AppSettings: Codable, Equatable, Sendable {
     /// button for people who dismissed it. Reset when the Slack toggle is switched back on.
     public var hasAskedForAccessibility = false
 
-    // Device trust (collector / grep-admin, see DeviceTrustSettings.swift)
+    // Admin address for "어드민 열기" (see DeviceTrustSettings.swift)
     public var deviceTrust = DeviceTrustSettings()
 
     public init() {}

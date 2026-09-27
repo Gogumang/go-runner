@@ -15,7 +15,6 @@ final class AppModel: ObservableObject {
     let quota: QuotaCoordinator
     let agentNotifier: AgentNotifier
     let slackNotifier: SlackNotifier
-    let deviceTrust: DeviceTrustController
 
     /// Samples kept for the menu's CPU graph (RunCat Neo keeps 61).
     static let historyLength = 61
@@ -40,7 +39,6 @@ final class AppModel: ObservableObject {
         self.quota = quota
         self.agentNotifier = agentNotifier
         self.slackNotifier = slackNotifier
-        deviceTrust = DeviceTrustController(settingsStore: settingsStore)
     }
 
     // MARK: Metrics
